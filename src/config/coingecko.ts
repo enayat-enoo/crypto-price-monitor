@@ -32,7 +32,7 @@ async function getCrypto(coinID: string, currency: string):Promise<number> {
 
     const price = response.data[coinID][currency];
     await redisClient.set(cachedKey, price.toString(), {EX: 30});
-    return price
+    return price;
   } catch (error) {
     throw new Error("Failed to fetch crypto data");
   }

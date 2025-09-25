@@ -8,10 +8,10 @@ export const evaluateAlerts = async () => {
     const price = await getCryptoPrice(alert.coinID, alert.currency);
 
     if (
-      (alert.condition === "above" && price > alert.threshold) ||
-      (alert.condition === "below" && price < alert.threshold)
+      (alert.condition === "above" && price > alert.targetPrice) ||
+      (alert.condition === "below" && price < alert.targetPrice)
     ) {
-      console.log(`Alert triggered for ${alert.coinID}: current price ${price} is ${alert.condition} ${alert.threshold}`);
+      console.log(`Alert triggered for ${alert.coinID}: current price ${price} is ${alert.condition} ${alert.targetPrice}`);
 
       alert.triggered = true;
       await alert.save();
