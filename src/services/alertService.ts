@@ -1,6 +1,6 @@
 import Alert from "../models/alertModel";
 import { getCryptoPrice } from "./fetcherService";
-import { getIO } from "../config/socket";
+import { getIO } from "../config/socket";  // add this helper
 
 export const evaluateAlerts = async () => {
   const alerts = await Alert.find({ triggered: false });
@@ -16,16 +16,18 @@ export const evaluateAlerts = async () => {
         `Alert triggered for ${alert.coinID}: current price ${price} is ${alert.condition} ${alert.targetPrice}`
       );
 
+      // Mark as triggered
       alert.triggered = true;
       await alert.save();
 
-      // 🔔 Send real-time notification
+      //Emit real-time alert via socket
       const io = getIO();
       io.emit("alert", {
-        coinID: alert.coinID,
-        price,
-        condition: alert.condition,
+        coin: alert.coinID,
+        currency: alert.currency,
         target: alert.targetPrice,
+        condition: alert.condition,
+        currentPrice: price,
       });
     }
   }

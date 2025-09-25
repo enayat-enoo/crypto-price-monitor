@@ -1,16 +1,25 @@
 import React from "react";
-import PriceViewer from "./components/PriceViewer";
-import AlertForm from "./components/AlertForm";
+import { ToastContainer } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
+import PriceViewer from "../src/components/PriceViewer";
+import AlertForm from "../src/components/AlertForm";
 
 const App: React.FC = () => {
   return (
-    <div>
-      <h1>Crypto Monitor Dashboard</h1>
+    <>
       <PriceViewer />
       <AlertForm />
-    </div>
+      <ToastContainer
+        position="top-center"
+        autoClose={5000}
+        hideProgressBar={false}
+        newestOnTop
+        closeOnClick
+        pauseOnHover
+        draggable
+      />
+    </>
   );
 };
 
 export default App;
-

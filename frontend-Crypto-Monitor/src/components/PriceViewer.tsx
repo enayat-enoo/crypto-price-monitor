@@ -1,18 +1,51 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import axios from "axios";
+import { io } from "socket.io-client";
+import { toast } from "react-toastify";
+
+interface Alert {
+  coin: string;
+  currency: string;
+  condition: "above" | "below";
+  target: number;
+  currentPrice: number;
+}
 
 const PriceViewer: React.FC = () => {
   const [coin, setCoin] = useState("bitcoin");
   const [currency, setCurrency] = useState("usd");
   const [price, setPrice] = useState<number | null>(null);
+  const [alerts, setAlerts] = useState<Alert[]>([]);
+
+  useEffect(() => {
+    const socket = io(import.meta.env.VITE_API_URL || "http://localhost:8000");
+
+    socket.on("connect", () => {
+      console.log("✅ Connected to Socket.IO server");
+    });
+
+    //Listen for alert events
+    socket.on("alert", (data: Alert) => {
+      console.log("🚨 Alert received:", data);
+      setAlerts((prev) => [...prev, data]);
+
+      //Show toast notification
+      toast.info(
+        `${data.coin.toUpperCase()} alert: ${data.currentPrice} is ${data.condition} ${data.target}`,
+        { autoClose: 5000 }
+      );
+    });
+
+    return () => {
+      socket.disconnect();
+    };
+  }, []);
 
   const fetchPrice = async () => {
     try {
       const res = await axios.get(
         `${import.meta.env.VITE_API_URL}/api/price`,
-        {
-          params: { coin, currency },
-        }
+        { params: { coin, currency } }
       );
       setPrice(res.data.price);
     } catch (err) {
@@ -34,11 +67,22 @@ const PriceViewer: React.FC = () => {
         placeholder="Currency"
       />
       <button onClick={fetchPrice}>Fetch Price</button>
+
       {price && (
         <p>
           {coin} in {currency}: {price}
         </p>
       )}
+
+      <h3 className="mt-4">Real-time Alerts</h3>
+      <ul>
+        {alerts.map((a, i) => (
+          <li key={i}>
+            {a.coin.toUpperCase()} in {a.currency}: {a.currentPrice} (
+            {a.condition} {a.target})
+          </li>
+        ))}
+      </ul>
     </div>
   );
 };
