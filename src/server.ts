@@ -4,6 +4,7 @@ import app from "./app";
 import { connectRedis } from "./config/redis";
 import connectToDb from "./config/db";
 import { evaluateAlerts } from "./services/alertService";
+import { startPolling } from "./services/fetcherService";
 
 const PORT = process.env.PORT || 8000;
 const REDIS_URL = process.env.REDIS_API || "redis://localhost:6379";
@@ -17,6 +18,10 @@ async function startServer() {
     await connectToDb(MONGODB_URL); 
     console.log("MongoDB connected");
 
+    //Start background polling
+    startPolling();
+    evaluateAlerts();
+
     app.listen(PORT, () => console.log(`Server running on port ${PORT}`));
   } catch (err) {
     console.error("Server startup failed:", err);
@@ -25,9 +30,6 @@ async function startServer() {
 }
 
 startServer();
-setInterval(() => {
-  evaluateAlerts().catch(console.error);
-}, 30_000);
 
 
 

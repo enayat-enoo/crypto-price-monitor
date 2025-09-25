@@ -1,5 +1,7 @@
 import getCrypto from "../config/coingecko";
 import { getRedisClient } from "../config/redis";
+import { evaluateAlerts } from "./alertService";
+
 
 export const getCryptoPrice = async (coinID: string, currency: string) => {
   const redis = getRedisClient();
@@ -21,3 +23,32 @@ export const getCryptoPrice = async (coinID: string, currency: string) => {
   await redis.set(cacheKey, price.toString(), { EX: 30 }); 
   return price;
 };
+
+
+//Background Polling
+
+export async function pollPrices() {
+  const coins = ["bitcoin", "ethereum"]; // Add more coins as needed
+  const currency = "usd";
+
+  const redis = getRedisClient();
+
+  for (const coin of coins) {
+    try {
+      const price = await getCrypto(coin, currency);
+
+      await redis.set(`price:${coin}:${currency}`, price.toString(), { EX: 30 });
+
+      console.log(`[Polling] Updated ${coin} price in Redis: ${price}`);
+    } catch (err) {
+      console.error(`[Polling Error] ${coin}:`, err);
+    }
+  }
+  // Evaluate alerts
+  await evaluateAlerts();
+}
+
+// Call this from server.ts to start automatic polling
+export function startPolling() {
+  setInterval(pollPrices, 30_000); // every 30 seconds
+}
