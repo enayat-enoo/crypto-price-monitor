@@ -1,9 +1,11 @@
 import dotenv from "dotenv";
 dotenv.config();
 import app from "./app";
+import http from "http";
+import { initSocket } from "./config/socket";
+import { evaluateAlerts } from "./services/alertService";
 import { connectRedis } from "./config/redis";
 import connectToDb from "./config/db";
-import { evaluateAlerts } from "./services/alertService";
 import { startPolling } from "./services/fetcherService";
 
 const PORT = process.env.PORT || 8000;
@@ -18,11 +20,15 @@ async function startServer() {
     await connectToDb(MONGODB_URL); 
     console.log("MongoDB connected");
 
+    const server = http.createServer(app);
+    const io = initSocket(server);
+
     //Start background polling
     startPolling();
-    evaluateAlerts();
 
-    app.listen(PORT, () => console.log(`Server running on port ${PORT}`));
+    setInterval(evaluateAlerts, 15000);
+
+    server.listen(PORT, () => console.log(`Server running on port ${PORT}`));
   } catch (err) {
     console.error("Server startup failed:", err);
     process.exit(1);
