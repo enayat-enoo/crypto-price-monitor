@@ -63,12 +63,12 @@ const PriceViewer: React.FC = () => {
       <h2>Live Price Viewer</h2>
       <input
         value={coin}
-        onChange={(e) => setCoin(e.target.value)}
+        onChange={(e) => setCoin((e.target.value).toLowerCase())}
         placeholder="Coin"
       />
       <input
         value={currency}
-        onChange={(e) => setCurrency(e.target.value)}
+        onChange={(e) => setCurrency((e.target.value).toLowerCase())}
         placeholder="Currency"
       />
       <button onClick={fetchPrice}>Fetch Price</button>
