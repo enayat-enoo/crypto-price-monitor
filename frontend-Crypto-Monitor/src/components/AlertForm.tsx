@@ -10,7 +10,7 @@ const AlertForm: React.FC = () => {
 
   const createAlert = async () => {
     try {
-      await axios.post(`${import.meta.env.REACT_APP_API_URL}/api/alerts`, {
+      await axios.post(`${import.meta.env.VITE_API_URL}/api/alerts`, {
         coinID,
         currency,
         targetPrice: Number(targetPrice),

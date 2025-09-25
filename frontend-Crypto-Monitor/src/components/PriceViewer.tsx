@@ -9,7 +9,7 @@ const PriceViewer: React.FC = () => {
   const fetchPrice = async () => {
     try {
       const res = await axios.get(
-        `${import.meta.env.REACT_APP_API_URL}/api/price`,
+        `${import.meta.env.VITE_API_URL}/api/price`,
         {
           params: { coin, currency },
         }
