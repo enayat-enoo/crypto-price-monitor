@@ -1,38 +1,34 @@
-import express from "express";
-const app = express();
 import dotenv from "dotenv";
-import { Router } from "express";
-import connectToRedis from "./config/redis";
-import connectToDb from "./config/db";
 dotenv.config();
+import app from "./app";
+import { connectRedis } from "./config/redis";
+import connectToDb from "./config/db";
+import { evaluateAlerts } from "./services/alertService";
 
 const PORT = process.env.PORT || 8000;
-
 const REDIS_URL = process.env.REDIS_API || "redis://localhost:6379";
 const MONGODB_URL = process.env.MONGODB_URL || "mongodb://localhost:27017/cryptomonitordb";
 
+async function startServer() {
+  try {
+    await connectRedis(REDIS_URL); 
+    console.log("Redis connected");
 
-//MongoDB connection
-connectToDb(MONGODB_URL)
-.then(() => console.log("Database connected successfully"))
-.catch((err) => {
-  console.log("Database connection failed", err);
-  process.exit(1);
-})
+    await connectToDb(MONGODB_URL); 
+    console.log("MongoDB connected");
 
-//Redis connection
-connectToRedis(REDIS_URL)
-.then(() => console.log("Redis connected successfully"))
-.catch((err) => {
-  console.log("Redis connection failed", err);
-  process.exit(1);
-})
+    app.listen(PORT, () => console.log(`Server running on port ${PORT}`));
+  } catch (err) {
+    console.error("Server startup failed:", err);
+    process.exit(1);
+  }
+}
+
+startServer();
+setInterval(() => {
+  evaluateAlerts().catch(console.error);
+}, 30_000);
 
 
-app.get("/", (req, res) => {
-  res.send("Hello TypeScript Crypto Monitor!");
-});
 
-app.listen(PORT, () => {
-  console.log(`Server running on port ${PORT}`);
-});
+
