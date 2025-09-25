@@ -1,25 +1,10 @@
 import { Router } from "express";
 import Alert from "../models/alertModel";
+import { createAlert } from "../controllers/alertController";
 
 const router = Router();
 
-// Create new alert
-router.post("/", async (req, res) => {
-  try {
-    const { coinID, currency = "usd", targetPrice, condition } = req.body;
-
-    if (!coinID || !targetPrice || !condition) {
-      return res.status(400).json({ error: "coinID, targetPrice and condition are required" });
-    }
-
-    const alert = new Alert({ coinID, currency, targetPrice, condition });
-    await alert.save();
-
-    res.status(201).json(alert);
-  } catch (err) {
-    res.status(500).json({ error: "Failed to create alert" });
-  }
-});
+router.post("/", createAlert);
 
 // Get all alerts
 router.get("/", async (_req, res) => {
@@ -32,4 +17,3 @@ router.get("/", async (_req, res) => {
 });
 
 export default router;
-

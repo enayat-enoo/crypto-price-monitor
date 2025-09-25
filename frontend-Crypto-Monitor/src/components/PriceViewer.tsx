@@ -16,22 +16,26 @@ const PriceViewer: React.FC = () => {
   const [currency, setCurrency] = useState("usd");
   const [price, setPrice] = useState<number | null>(null);
   const [alerts, setAlerts] = useState<Alert[]>([]);
+  const [fetchedCoin, setFetchedCoin] = useState(coin);
+  const [fetchedCurrency, setFetchedCurrency] = useState(currency);
 
   useEffect(() => {
-    const socket = io(import.meta.env.VITE_API_URL || "http://localhost:8000");
+    const socket = io(import.meta.env.VITE_API_UR);
 
     socket.on("connect", () => {
-      console.log("✅ Connected to Socket.IO server");
+      console.log("Connected to Socket.IO server");
     });
 
     //Listen for alert events
     socket.on("alert", (data: Alert) => {
-      console.log("🚨 Alert received:", data);
+      console.log("Alert received:", data);
       setAlerts((prev) => [...prev, data]);
 
       //Show toast notification
       toast.info(
-        `${data.coin.toUpperCase()} alert: ${data.currentPrice} is ${data.condition} ${data.target}`,
+        `${data.coin.toUpperCase()} alert: ${data.currentPrice} is ${
+          data.condition
+        } ${data.target}`,
         { autoClose: 5000 }
       );
     });
@@ -43,11 +47,12 @@ const PriceViewer: React.FC = () => {
 
   const fetchPrice = async () => {
     try {
-      const res = await axios.get(
-        `${import.meta.env.VITE_API_URL}/api/price`,
-        { params: { coin, currency } }
-      );
+      const res = await axios.get(`${import.meta.env.VITE_API_URL}/api/price`, {
+        params: { coin, currency },
+      });
       setPrice(res.data.price);
+      setFetchedCoin(coin);
+      setFetchedCurrency(currency);
     } catch (err) {
       console.error(err);
     }
@@ -70,7 +75,7 @@ const PriceViewer: React.FC = () => {
 
       {price && (
         <p>
-          {coin} in {currency}: {price}
+          {fetchedCoin.toUpperCase()} in {fetchedCurrency}: {price}
         </p>
       )}
 
