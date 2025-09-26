@@ -1,26 +1,41 @@
-# Crypto Price Monitoring
+## Crypto Price Monitoring & Alerting System
 
-Run:
-1. Ensure MongoDB and Redis are running (Redis on 127.0.0.1:6379).
-2. Install deps: npm install
-3. Dev: npm run dev
-   or Build+Start: npm run build && npm start
+A real-time cryptocurrency price monitoring and alerting system with caching optimizations using Node.js, TypeScript, Redis, MongoDB, and React.
 
-Endpoints:
-- GET /api/price?coin=bitcoin&currency=usd
-  -> Returns the latest price (uses Redis cache with TTL)
+## Features
 
-- POST /api/alerts
-  Body:
-  {
-    "coinID": "bitcoin",
-    "currency": "usd",
-    "targetPrice": 27000,
-    "condition": "above"  // or "below"
-  }
-  -> Stores alert in MongoDB. A background job evaluates alerts periodically and logs triggers.
+Real-time Monitoring: Fetch live cryptocurrency prices from CoinGecko API.
 
-Notes:
-- Redis used to cache `price:<coin>:<currency>` with TTL (30s).
-- Alert evaluator uses cached/latest price and marks alerts as `triggered` once fired.
-- Notifications currently print to console; can be replaced with Socket.IO or email.
+Alerting System: Users can set price alerts (above/below thresholds) and get real-time notifications.
+
+Caching: Recent prices cached in Redis for fast responses and reduced API calls.
+
+Frontend: Simple React interface to view prices and create alerts.
+
+## Tech Stack
+
+Backend: Node.js, Express.js, TypeScript
+
+Database: MongoDB
+
+Cache: Redis
+
+Real-time: Socket.IO
+
+Frontend: React, Axios, React-Toastify
+
+## Usage
+
+Select a coin and currency, then fetch the latest price.
+
+Create alerts for specific price targets.
+
+Receive real-time notifications when alerts are triggered.
+
+## Notes
+
+Redis caches each price for 30 seconds to reduce API calls.
+
+Only coins requested by users are continuously polled.
+
+Error handling implemented for invalid coin or currency requests.
