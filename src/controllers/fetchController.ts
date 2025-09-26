@@ -2,8 +2,8 @@ import { Request, Response } from "express";
 import { getCryptoPrice } from "../services/fetcherService";
 
 export const fetchPrice = async (req: Request, res: Response) => {
-  const coin = req.query.coin as string;
-  const currency = (req.query.currency as string) || "usd";
+  const coin = (req.query.coin as string).toLowerCase();
+  const currency = (req.query.currency as string).toLowerCase() || "usd";
 
   if (!coin) return res.status(400).json({ error: "Coin ID is required" });
 

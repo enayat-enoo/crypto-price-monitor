@@ -16,11 +16,11 @@ export const evaluateAlerts = async () => {
         `Alert triggered for ${alert.coinID}: current price ${price} is ${alert.condition} ${alert.targetPrice}`
       );
 
-      // Mark as triggered
+      //Mark as triggered
       alert.triggered = true;
       await alert.save();
 
-      //Emit real-time alert via socket
+      //Emit real-time alert
       const io = getIO();
       io.emit("alert", {
         coin: alert.coinID,
